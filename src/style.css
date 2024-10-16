@@ -4,3 +4,23 @@ html, body {
   font-family: sans-serif;
   overflow: hidden;
 }
+
+#controls {
+  display: block;
+  position: fixed;
+  top: 30px;
+  left: 30px;
+  background: #EFEFEF;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+#reset-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 5px;
+}
+
+div.checkbox label {
+  font-size: 12px;
+}

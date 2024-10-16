@@ -32,8 +32,6 @@ export class Particle {
   }
 
   display(p: p5) {
-    p.stroke(255, 50);
-    p.strokeWeight(1);
     p.point(this.pos);
   }
 }

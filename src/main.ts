@@ -3,12 +3,33 @@ import './style.css';
 import p5 from 'p5';
 import { Particle } from './particle';
 
+const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
+const showVectorsCheckbox: HTMLInputElement = document.getElementById('show-vectors') as HTMLInputElement;
+const showParticlesCheckbox = document.getElementById('show-particles') as HTMLInputElement;
+
+showVectorsCheckbox.checked = false;
+showParticlesCheckbox.checked = true;
+showParticlesCheckbox.disabled = true;
+
+let SCALE = 50;
+let ZOFF = 0;
+let NUM_PARTICLES = 500;
+let PARTICLES: Particle[] = [];
+let FLOW_FIELD: p5.Vector[][] = [];
+
 new p5((p: p5) => {
-  let SCALE = 50;
-  let ZOFF = 0;
-  let NUM_PARTICLES = 500;
-  let PARTICLES: Particle[] = [];
-  let FLOW_FIELD: p5.Vector[][] = [];
+  resetBtn?.addEventListener('click', () => p.background(0));
+  
+  showVectorsCheckbox?.addEventListener('change', (e: any) => {
+    if (e.target?.checked) {
+      showParticlesCheckbox.disabled = false;
+    } else {
+      showParticlesCheckbox.disabled = true;
+      showParticlesCheckbox.checked = true;
+    }
+
+    p.background(0);
+  });
 
   p.windowResized = () => {
     p.resizeCanvas(window.innerWidth, window.innerHeight, true);
@@ -42,11 +63,11 @@ new p5((p: p5) => {
   };
 
   p.draw = () => {
-    // p.background(0);
+    if (showVectorsCheckbox.checked) p.background(0);
     let COLS = p.width / SCALE;
     let ROWS = p.height / SCALE;
 
-    p.stroke(255, 50);
+    p.stroke(255, 40);
     p.strokeWeight(1);
     p.noFill();
 
@@ -58,11 +79,15 @@ new p5((p: p5) => {
         let vec = p5.Vector.fromAngle(angle);
         vec.setMag(0.5);
         FLOW_FIELD[y][x] = vec;
-        // p.push();
-        // p.translate(x*SCALE, y*SCALE);
-        // p.rotate(vec.heading());
-        // p.line(0, 0, SCALE, 0);
-        // p.pop();
+        if (showVectorsCheckbox.checked) {
+          p.push();
+          p.translate(x*SCALE, y*SCALE);
+          p.rotate(vec.heading());
+          p.line(0, 0, (2*SCALE)/3, 0);
+          p.line((2*SCALE)/3, 0, (1*SCALE)/3, SCALE/5);
+          p.line((2*SCALE)/3, 0, (1*SCALE)/3, -SCALE/5);
+          p.pop();
+        }
         xoff += 0.1;
       }
       yoff += 0.1;
@@ -79,6 +104,16 @@ new p5((p: p5) => {
 
       particle.update();
       particle.edges(p);
+
+      if (showVectorsCheckbox.checked && !showParticlesCheckbox.checked) continue;
+
+      if (showVectorsCheckbox.checked) {
+        p.strokeWeight(4);
+        p.stroke(255);
+      } else {
+        p.strokeWeight(1);
+        p.stroke(255, 50);
+      };
       particle.display(p);
     }
   };
